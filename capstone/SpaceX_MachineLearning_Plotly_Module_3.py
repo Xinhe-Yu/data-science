@@ -50,17 +50,20 @@ def draw_success_pie(input_site):
     if input_site != "ALL":
         series = spacex_df.loc[spacex_df['Launch Site'] == input_site, 'class']
         title = f"Success vs Fail – {input_site}"
-    else:
-        series = spacex_df['class']
-        title = "Success vs Fail – All Sites"
-
-    # map 1/0 to labels, count, and shape for px.pie
-    counts = (series.map({1: 'Success', 0: 'Fail'})       # <-- 0, not 2
+            # map 1/0 to labels, count, and shape for px.pie
+        counts = (series.map({1: 'Success', 0: 'Fail'})       # <-- 0, not 2
                     .value_counts()
                     .rename_axis('Outcome')
                     .reset_index(name='count'))
 
-    fig = px.pie(counts, names='Outcome', values='count', title=title)
+        fig = px.pie(counts, names='Outcome', values='count', title=title)
+    else:
+        title = "Total Successful Launches by Launch Site"
+        counts = (spacex_df.groupby('Launch Site')['class']
+                            .sum()                         # sum of 1/0 = number of successes
+                            .reset_index(name='Successes'))
+
+        fig = px.pie(counts, names='Launch Site', values='Successes', title=title)
     return fig
 
 # TASK 4:
